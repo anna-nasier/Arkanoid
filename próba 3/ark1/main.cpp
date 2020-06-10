@@ -171,17 +171,18 @@ int main(){
         // koniec
 
         for(int i=0; i<10; i++){
-            Klocek_niebieski kloc;
-            kloc.setTexture(klocek_80);
-            kloc.setPosition(405+i*64, 15);
-            wsk_obiekty.emplace_back(&kloc);
+            Klocek * klocek_ptr = new Klocek_niebieski;
+            klocek_ptr->setTexture(klocek_80);
+            klocek_ptr->setPosition(405+i*64, 15);
+            klocek_ptr->setScale(1.0, 1.0);
+            wsk_obiekty.emplace_back(klocek_ptr);
 
         }
 
 
 
 
-        pilka_.animate(platforma);
+        pilka_.animate(platforma, wsk_obiekty, klocki);
         window.draw(tlo_);
         window.draw(napis);
         window.draw(platforma);

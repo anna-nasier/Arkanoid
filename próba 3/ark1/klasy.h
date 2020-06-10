@@ -41,13 +41,57 @@ public:
   }
 
 };
+
+
+class Klocek :public sf::Sprite{
+public:
+
+    int max_dmg;
+    int dmg;
+    int pkty;
+    bool usun=false;
+
+    virtual void changeTexture1(std::vector<sf::Texture> w)=0;
+    virtual void changeTexture2(std::vector<sf::Texture> w)=0;
+
+};
+
+class Klocek_bialy : public Klocek{
+public:
+
+    Klocek_bialy(){dmg=0; max_dmg = 1; pkty =10;}
+    virtual void changeTexture1(std::vector<sf::Texture> w) override;
+    virtual void changeTexture2(std::vector<sf::Texture> w) override;
+};
+
+class Klocek_fioletowy :public Klocek{
+public:
+
+    Klocek_fioletowy(){dmg=0; max_dmg = 2; pkty = 30;}
+    void changeTexture1(std::vector<sf::Texture> w) override{
+        if (dmg == max_dmg/2) {setTexture(w[4]);}
+    };
+    virtual void changeTexture2(std::vector<sf::Texture> w) override;
+};
+
+class Klocek_niebieski :public Klocek{
+public:
+
+    Klocek_niebieski(){dmg=0; max_dmg = 4; pkty = 80;}
+    void changeTexture1(std::vector<sf::Texture> w) override {
+        if (dmg== max_dmg/2) {setTexture(w[1]);}
+    }
+    void changeTexture2(std::vector<sf::Texture> w) override {
+            if (dmg== 3*max_dmg/4) {setTexture(w[2]);}
+        }
+};
 class Pilka:public AnimatedSprite{
 public:
     float velx=2;
     float vely=-2;
 
 
-    void bounce(Platforma &platforma) {
+    void bounce(Platforma &platforma, std::vector<Klocek*> w, std::vector<sf::Texture> w2 ) {
         auto bounds = getGlobalBounds();
         if (bounds.left < bound_left) {
             velx = std::abs(velx);
@@ -61,12 +105,21 @@ public:
         if (platforma.getGlobalBounds().intersects(bounds)){
             vely = -std::abs(vely);
         }
-
+        for (auto x: w)
+        if (getGlobalBounds().intersects(x->getGlobalBounds())){
+               vely = -std::abs(vely);
+               x->dmg++;
+               std::cout<<x->dmg<<std::endl;
+               std::cout<<x->usun<<std::endl;
+               if (x->dmg==x->max_dmg) {x->usun = true;}
+               x->changeTexture1(w2);
+               x->changeTexture2(w2);
+            }
     }
 
-    void animate(Platforma platforma) {
+    void animate(Platforma platforma, std::vector<Klocek*> w, std::vector<sf::Texture> w2 ) {
         move(velx, vely);
-        bounce(platforma);
+        bounce(platforma, w, w2);
 
 
 
@@ -77,62 +130,6 @@ public:
 
     }
 
-};
-
-
-
-
-class Klocek :public sf::Sprite{
-public:
-
-    int max_dmg;
-    int dmg=0;
-    int pkty;
-    bool usun=false;
-
-    void collision(Pilka pilka, std::vector<sf::Texture> w) {
-        if (getGlobalBounds().intersects(pilka.getGlobalBounds())){
-           pilka.vely = std::abs(pilka.vely);
-           dmg++;
-           if (dmg==max_dmg) {usun = true;}
-           changeTexture1(w);
-           changeTexture2(w);
-        }
-    };
-
-    virtual void changeTexture1(std::vector<sf::Texture> w)=0;
-    virtual void changeTexture2(std::vector<sf::Texture> w)=0;
-
-};
-
-class Klocek_bialy : public Klocek{
-public:
-
-    Klocek_bialy(){max_dmg = 1; pkty =10;}
-    virtual void changeTexture1(std::vector<sf::Texture> w) override;
-    virtual void changeTexture2(std::vector<sf::Texture> w) override;
-};
-
-class Klocek_fioletowy :public Klocek{
-public:
-
-    Klocek_fioletowy(){max_dmg = 2; pkty = 30;}
-    void changeTexture1(std::vector<sf::Texture> w) override{
-        if (dmg == max_dmg/2) {setTexture(w[4]);}
-    };
-    virtual void changeTexture2(std::vector<sf::Texture> w) override;
-};
-
-class Klocek_niebieski :public Klocek{
-public:
-
-    Klocek_niebieski(){max_dmg = 4; pkty = 80;}
-    void changeTexture1(std::vector<sf::Texture> w) override {
-        if (dmg== max_dmg/2) {setTexture(w[1]);}
-    }
-    void changeTexture2(std::vector<sf::Texture> w) override {
-            if (dmg== 3*max_dmg/4) {setTexture(w[2]);}
-        }
 };
 
 /*
