@@ -3,10 +3,11 @@
 
 #include <SFML/Graphics.hpp>
 #include<iostream>
+#include<vector>
 
-class NapisTextures{
+class Textures{
 public:
-    NapisTextures(std::vector<sf::Texture>&textures_){std::copy(textures_.begin(),textures_.end(),std::back_inserter(textures));}
+    Textures(std::vector<sf::Texture>&textures_){std::copy(textures_.begin(),textures_.end(),std::back_inserter(textures));}
     std::vector<sf::Texture>textures;
 };
 
@@ -45,14 +46,14 @@ public:
 
 class Klocek :public sf::Sprite{
 public:
-
+    virtual ~Klocek()= default;
     int max_dmg;
     int dmg;
     int pkty;
     bool usun=false;
 
-    virtual void changeTexture1(std::vector<sf::Texture> w)=0;
-    virtual void changeTexture2(std::vector<sf::Texture> w)=0;
+    virtual void changeTexture1(Textures &obj)=0;
+    virtual void changeTexture2(Textures &obj)=0;
 
 };
 
@@ -60,29 +61,35 @@ class Klocek_bialy : public Klocek{
 public:
 
     Klocek_bialy(){dmg=0; max_dmg = 1; pkty =10;}
-    virtual void changeTexture1(std::vector<sf::Texture> w) override;
-    virtual void changeTexture2(std::vector<sf::Texture> w) override;
+    ~Klocek_bialy(){};
+    virtual void changeTexture1(Textures &obj) override;
+    virtual void changeTexture2(Textures &obj) override;
 };
 
 class Klocek_fioletowy :public Klocek{
 public:
 
     Klocek_fioletowy(){dmg=0; max_dmg = 2; pkty = 30;}
-    void changeTexture1(std::vector<sf::Texture> w) override{
-        if (dmg == max_dmg/2) {setTexture(w[4]);}
+    ~Klocek_fioletowy(){};
+    void changeTexture1(Textures &obj) override{
+        auto Ptr = &obj.textures[4];
+        if (dmg == max_dmg/2) {setTexture(*Ptr);}
     };
-    virtual void changeTexture2(std::vector<sf::Texture> w) override;
+    virtual void changeTexture2(Textures &obj) override;
 };
 
 class Klocek_niebieski :public Klocek{
 public:
 
     Klocek_niebieski(){dmg=0; max_dmg = 4; pkty = 80;}
-    void changeTexture1(std::vector<sf::Texture> w) override {
-        if (dmg== max_dmg/2) {setTexture(w[1]);}
+    ~Klocek_niebieski(){};
+    void changeTexture1(Textures &obj) override {
+        auto Ptr = &obj.textures[1];
+        if (dmg== max_dmg/2) {setTexture(*Ptr);}
     }
-    void changeTexture2(std::vector<sf::Texture> w) override {
-            if (dmg== 3*max_dmg/4) {setTexture(w[2]);}
+    void changeTexture2(Textures &obj) override {
+        auto Ptr = &obj.textures[2];
+            if (dmg== 3*max_dmg/4) {setTexture(*Ptr);}
         }
 };
 class Pilka:public AnimatedSprite{
@@ -91,7 +98,7 @@ public:
     float vely=-2;
 
 
-    void bounce(Platforma &platforma, std::vector<Klocek*> &w, std::vector<sf::Texture> &w2 ) {
+    void bounce(Platforma &platforma, std::vector<std::unique_ptr<Klocek>> &w, Textures &obj) {
         auto bounds = getGlobalBounds();
         if (bounds.left < bound_left) {
             velx = std::abs(velx);
@@ -105,30 +112,30 @@ public:
         if (platforma.getGlobalBounds().intersects(bounds)){
             vely = -std::abs(vely);
         }
-        for (auto x: w)
-                if (x->getGlobalBounds().intersects(bounds)){
+        for (unsigned int i=0; i<w.size(); i++){
+                if (w[i]->getGlobalBounds().intersects(bounds)){
                        vely = -vely;
-                       x->dmg++;
-                       std::cout<<x->dmg<<std::endl;
-                       std::cout<<x->usun<<std::endl;
-                       if (x->dmg==x->max_dmg) {x->usun = true;}
-                       x->changeTexture1(w2);
-                       x->changeTexture2(w2);
+                       w[i]->dmg++;
+                       std::cout<<w[i]->dmg<<std::endl;
+                       //std::cout<<w[i]->usun<<std::endl;
+                       if (w[i]->dmg==w[i]->max_dmg) {w.erase(w.begin()+i);}
+                       w[i]->changeTexture1(obj);
+                       w[i]->changeTexture2(obj);
                 }
     }
+    }
 
-    void animate(Platforma platforma, std::vector<Klocek*> &w, std::vector<sf::Texture> &w2 ) {
+    void animate(Platforma platforma, std::vector<std::unique_ptr<Klocek>> &w, Textures &obj) {
         move(velx, vely);
-        bounce(platforma, w, w2);
-
-
-
+        bounce(platforma, w, obj);
         }
+
     void setSpeed(float velocity_x, float velocity_y) {
         velx = velocity_x;
         vely = velocity_y;
 
     }
+
 
 };
 

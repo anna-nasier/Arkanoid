@@ -12,6 +12,7 @@ int main(){
 
     sf::RenderWindow window(sf::VideoMode(width,height),"Arkanoid");
     window.setFramerateLimit(120);
+
     std::vector<sf::Texture>toLoad;
 
     //tlo napis i sprite
@@ -44,7 +45,7 @@ int main(){
     napis4.loadFromFile("napis4.png");
     toLoad.emplace_back(napis4);
 
-    NapisTextures napisTxt(toLoad);
+    Textures napisTxt(toLoad);
 
     sf::Sprite napis;
     napis.setPosition(55,0);
@@ -112,6 +113,7 @@ int main(){
         return 1;
     }
     klocki.emplace_back(klocek_niespodzianka);
+    Textures klocuchy(klocki);
 
     // platfotma
 
@@ -139,13 +141,13 @@ int main(){
     size_t napisType = 0;
     sf::Clock clock;
 
-    std::vector<Klocek*> wsk_obiekty;
+    std::vector<std::unique_ptr<Klocek>> wsk_obiekty;
     for(int i=0; i<10; i++){
-        Klocek * klocek_ptr = new Klocek_niebieski;
-        klocek_ptr->setTexture(klocek_80);
-        klocek_ptr->setPosition(405+i*64, 15);
-        klocek_ptr->setScale(1.0, 1.0);
-        wsk_obiekty.emplace_back(klocek_ptr);
+        wsk_obiekty.emplace_back(std::make_unique<Klocek_niebieski>());
+        wsk_obiekty[i]->setTexture(klocek_80);
+        wsk_obiekty[i]->setPosition(405+i*64, 15);
+        wsk_obiekty[i]->setScale(1.0, 1.0);
+
 
     }
 
@@ -182,11 +184,11 @@ int main(){
 
 
 
-        pilka_.animate(platforma, wsk_obiekty, klocki);
+        pilka_.animate(platforma, wsk_obiekty, klocuchy);
         window.draw(tlo_);
         window.draw(napis);
         window.draw(platforma);
-        for(auto x : wsk_obiekty){
+        for(auto &x : wsk_obiekty){
             window.draw(*x);
         }
         window.draw(pilka_);
