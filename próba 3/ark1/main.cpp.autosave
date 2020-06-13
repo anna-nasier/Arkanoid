@@ -12,6 +12,7 @@ int main(){
 
     sf::RenderWindow window(sf::VideoMode(width,height),"Arkanoid");
     window.setFramerateLimit(120);
+    
     std::vector<sf::Texture>toLoad;
 
     //tlo napis i sprite
@@ -44,7 +45,7 @@ int main(){
     napis4.loadFromFile("napis4.png");
     toLoad.emplace_back(napis4);
 
-    NapisTextures napisTxt(toLoad);
+    Textures napisTxt(toLoad);
 
     sf::Sprite napis;
     napis.setPosition(55,0);
