@@ -96,7 +96,8 @@ class Pilka:public AnimatedSprite{
 public:
     float velx=2;
     float vely=-2;
-
+    int points=0;
+    int zycia=3;
 
     void bounce(Platforma &platforma, std::vector<std::unique_ptr<Klocek>> &w, Textures &obj) {
         auto bounds = getGlobalBounds();
@@ -109,6 +110,11 @@ public:
         if (bounds.top < bound_top) {
             vely = std::abs(vely);
         }
+        if (bounds.top + bounds.width > bound_bot) {
+            zycia--;
+            setPosition(640,500);
+            vely=-std::abs(vely);
+        }
         if (platforma.getGlobalBounds().intersects(bounds)){
             vely = -std::abs(vely);
         }
@@ -117,26 +123,30 @@ public:
                     //zderzenie od góry
                     if(x->getGlobalBounds().top < getPosition().y && x->getGlobalBounds().left<getPosition().x &&
                        x->getGlobalBounds().left + x->getGlobalBounds().width > getPosition().x){
-                       vely = -std::abs(vely);}
+                       vely = -std::abs(vely);
+                        std::cout<<"a"<<std::endl;}
                     //zderzenie od dołu
                     if (x->getGlobalBounds().top + x->getGlobalBounds().height>getPosition().y &&
                         x->getGlobalBounds().left < getPosition().x &&
                         x->getGlobalBounds().left + x->getGlobalBounds().width > getPosition().x)
-                       {vely=std::abs(vely);}
+                       {vely=std::abs(vely);
+                        std::cout<<"b"<<std::endl;}
                     //zderzenie od lewej
                     if (x->getGlobalBounds().left < getPosition().x && x->getGlobalBounds().top < getPosition().y &&
                         x->getGlobalBounds().top+x->getGlobalBounds().height > getPosition().y){
                         velx=-std::abs(velx);
+                        std::cout<<"c"<<std::endl;
                     }
                     //zderzenie od prawej
                     if (x->getGlobalBounds().left + x->getGlobalBounds().width > getPosition().x &&
                         x->getGlobalBounds().top <getPosition().y &&
                         x->getGlobalBounds().top + x->getGlobalBounds().height > getPosition().y)
-                    {velx=std::abs(velx);}
+                    {velx=std::abs(velx);
+                        std::cout<<"d"<<std::endl;}
                        x->dmg++;
                        std::cout<<x->dmg<<std::endl;
                        std::cout<<x->usun<<std::endl;
-                       if (x->dmg==x->max_dmg) {x->usun = true;}
+                       if (x->dmg==x->max_dmg) {x->usun = true; points = points + x->pkty;}
                        x->changeTexture1(obj);
                        x->changeTexture2(obj);
                 }
@@ -165,11 +175,18 @@ class Klocek_niespodzianka:public Klocek {
 
 };
 
-class Klocek_cegla : public sf::Sprite{
+*/
+
+class Klocek_cegla : public Klocek{
+public:
+    Klocek_cegla(sf::Texture &texture){dmg=0; max_dmg=INT_MAX; pkty=0; setTexture(texture);}
+    ~Klocek_cegla(){};
+    virtual void changeTexture1(Textures &obj) override{};
+    virtual void changeTexture2(Textures &obj) override{};
 
 };
 
-*/
+
 
 
 

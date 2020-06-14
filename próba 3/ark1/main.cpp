@@ -1,8 +1,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include "klasy.h"
-#include<algorithm>
-#include<vector>
+#include<windows.h>
 
 
 int width = 1280;
@@ -139,6 +138,38 @@ int main(){
     pilka_.setScale(0.2,0.2);
     pilka_.setPosition(640, 500);
 
+    sf::Font font;
+    if (!font.loadFromFile("Acme-Regular.ttf")){
+        std::cout<<"Could not load font" <<std::endl;
+    }
+
+    sf::Text pu;
+    pu.setFont(font);
+    pu.setPosition(40,120);
+    std::string pi="PUNKTY:";
+    pu.setString(pi);
+
+    sf::Text punkty;
+    punkty.setFont(font);
+    punkty.setPosition(170,120);
+
+    sf::Text zycie1;
+    zycie1.setFont(font);
+    zycie1.setPosition(40, 150);
+    std::string z="ZYCIA:";
+    zycie1.setString(z);
+
+    sf::Text zycie2;
+    zycie2.setFont(font);
+    zycie2.setPosition(140, 150);
+
+    sf::Text koniec;
+    koniec.setFont(font);
+    koniec.setPosition(400, 360);
+    koniec.setCharacterSize(100);
+    std::string konie="PRZEGRANA!";
+    koniec.setString(konie);
+
 
     size_t napisType = 0;
     sf::Clock clock;
@@ -162,7 +193,8 @@ int main(){
         obiekty[i]->setPosition(405+(i-20)*64, 79);
         obiekty[i]->setScale(1.0, 1.0);
     }
-
+    int pnkty;
+    int zy;
     while(window.isOpen()){
 
         sf::Event event;
@@ -175,7 +207,7 @@ int main(){
             }
         }
 
-        window.clear();
+
 
         sf::Time time = clock.getElapsedTime();
         float time_ = time.asSeconds();
@@ -191,12 +223,27 @@ int main(){
         }
         // koniec
 
+        //punkty
+        pnkty = pilka_.points;
+        std::string p = std::to_string(pnkty);
+        punkty.setString(p);
+
+        //zycia
+
+        zy= pilka_.zycia;
+        std::string zycka = std::to_string(zy);
+        zycie2.setString(zycka);
+
+
+
 
         pilka_.animate(platforma, obiekty, klocuchy);
         for (size_t i=0; i<obiekty.size(); ++i){
             if (obiekty[i]->usun){
                 obiekty.erase(obiekty.begin()+i);
             }}
+        window.clear();
+
         window.draw(tlo_);
         window.draw(napis);
         window.draw(platforma);
@@ -204,6 +251,15 @@ int main(){
             window.draw(*x);
         }
         window.draw(pilka_);
+        window.draw(pu);
+        window.draw(punkty);
+        window.draw(zycie1);
+        window.draw(zycie2);
+        if (pilka_.zycia<0){
+           window.draw(koniec);
+            Sleep(1000);
+            window.close();
+        }
 
         window.display();
 
