@@ -62,8 +62,8 @@ public:
 
     Klocek_bialy(){dmg=0; max_dmg = 1; pkty =10;}
     ~Klocek_bialy(){};
-    virtual void changeTexture1(Textures &obj) override;
-    virtual void changeTexture2(Textures &obj) override;
+    virtual void changeTexture1(Textures &obj) override{};
+    virtual void changeTexture2(Textures &obj) override{};
 };
 
 class Klocek_fioletowy :public Klocek{
@@ -75,7 +75,7 @@ public:
         auto Ptr = &obj.textures[4];
         if (dmg == max_dmg/2) {setTexture(*Ptr);}
     };
-    virtual void changeTexture2(Textures &obj) override;
+    virtual void changeTexture2(Textures &obj) override{};
 };
 
 class Klocek_niebieski :public Klocek{
@@ -112,15 +112,33 @@ public:
         if (platforma.getGlobalBounds().intersects(bounds)){
             vely = -std::abs(vely);
         }
-        for (unsigned int i=0; i<w.size(); i++){
-                if (w[i]->getGlobalBounds().intersects(bounds)){
-                       vely = -vely;
-                       w[i]->dmg++;
-                       std::cout<<w[i]->dmg<<std::endl;
-                       //std::cout<<w[i]->usun<<std::endl;
-                       if (w[i]->dmg==w[i]->max_dmg) {w.erase(w.begin()+i);}
-                       w[i]->changeTexture1(obj);
-                       w[i]->changeTexture2(obj);
+        for(auto &x: w){
+                if (   x->getGlobalBounds().intersects(bounds)){
+                    //zderzenie od góry
+                    if(x->getGlobalBounds().top < getPosition().y && x->getGlobalBounds().left<getPosition().x &&
+                       x->getGlobalBounds().left + x->getGlobalBounds().width > getPosition().x){
+                       vely = -std::abs(vely);}
+                    //zderzenie od dołu
+                    if (x->getGlobalBounds().top + x->getGlobalBounds().height>getPosition().y &&
+                        x->getGlobalBounds().left < getPosition().x &&
+                        x->getGlobalBounds().left + x->getGlobalBounds().width > getPosition().x)
+                       {vely=std::abs(vely);}
+                    //zderzenie od lewej
+                    if (x->getGlobalBounds().left < getPosition().x && x->getGlobalBounds().top < getPosition().y &&
+                        x->getGlobalBounds().top+x->getGlobalBounds().height > getPosition().y){
+                        velx=-std::abs(velx);
+                    }
+                    //zderzenie od prawej
+                    if (x->getGlobalBounds().left + x->getGlobalBounds().width > getPosition().x &&
+                        x->getGlobalBounds().top <getPosition().y &&
+                        x->getGlobalBounds().top + x->getGlobalBounds().height > getPosition().y)
+                    {velx=std::abs(velx);}
+                       x->dmg++;
+                       std::cout<<x->dmg<<std::endl;
+                       std::cout<<x->usun<<std::endl;
+                       if (x->dmg==x->max_dmg) {x->usun = true;}
+                       x->changeTexture1(obj);
+                       x->changeTexture2(obj);
                 }
     }
     }

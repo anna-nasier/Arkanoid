@@ -1,6 +1,8 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include "klasy.h"
+#include<algorithm>
+#include<vector>
 
 
 int width = 1280;
@@ -141,16 +143,25 @@ int main(){
     size_t napisType = 0;
     sf::Clock clock;
 
-    std::vector<std::unique_ptr<Klocek>> wsk_obiekty;
+    std::vector<std::unique_ptr<Klocek>> obiekty;
     for(int i=0; i<10; i++){
-        wsk_obiekty.emplace_back(std::make_unique<Klocek_niebieski>());
-        wsk_obiekty[i]->setTexture(klocek_80);
-        wsk_obiekty[i]->setPosition(405+i*64, 15);
-        wsk_obiekty[i]->setScale(1.0, 1.0);
-
-
+        obiekty.emplace_back(std::make_unique<Klocek_niebieski>());
+        obiekty[i]->setTexture(klocek_80);
+        obiekty[i]->setPosition(405+i*64, 15);
+        obiekty[i]->setScale(1.0, 1.0);
     }
-
+    for(int i=10; i<20; i++){
+        obiekty.emplace_back(std::make_unique<Klocek_fioletowy>());
+        obiekty[i]->setTexture(klocek_30);
+        obiekty[i]->setPosition(405+(i-10)*64, 47);
+        obiekty[i]->setScale(1.0, 1.0);
+    }
+    for(int i=20; i<30; i++){
+        obiekty.emplace_back(std::make_unique<Klocek_bialy>());
+        obiekty[i]->setTexture(klocek_10);
+        obiekty[i]->setPosition(405+(i-20)*64, 79);
+        obiekty[i]->setScale(1.0, 1.0);
+    }
 
     while(window.isOpen()){
 
@@ -181,14 +192,15 @@ int main(){
         // koniec
 
 
-
-
-
-        pilka_.animate(platforma, wsk_obiekty, klocuchy);
+        pilka_.animate(platforma, obiekty, klocuchy);
+        for (size_t i=0; i<obiekty.size(); ++i){
+            if (obiekty[i]->usun){
+                obiekty.erase(obiekty.begin()+i);
+            }}
         window.draw(tlo_);
         window.draw(napis);
         window.draw(platforma);
-        for(auto &x : wsk_obiekty){
+        for(auto &x : obiekty){
             window.draw(*x);
         }
         window.draw(pilka_);
