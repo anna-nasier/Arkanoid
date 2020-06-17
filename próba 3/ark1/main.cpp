@@ -138,6 +138,39 @@ int main(){
     pilka_.setScale(0.2,0.2);
     pilka_.setPosition(640, 500);
 
+    //modyfikatory
+
+    std::vector<sf::Texture> modifiers;
+
+    sf::Texture slow;
+    if (!slow.loadFromFile("snail.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+        return 1;
+    }
+    modifiers.emplace_back(slow);
+
+    sf::Texture fast;
+    if (!fast.loadFromFile("rabbit.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+        return 1;
+    }
+    modifiers.emplace_back(fast);
+    sf::Texture death;
+    if (!death.loadFromFile("skull.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+        return 1;
+    }
+    modifiers.emplace_back(death);
+
+    sf::Texture points;
+    if (!points.loadFromFile("gold.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+        return 1;
+    }
+    modifiers.emplace_back(points);
+    Textures modyf(modifiers);
+    //napisy
+
     sf::Font font;
     if (!font.loadFromFile("Acme-Regular.ttf")){
         std::cout<<"Could not load font" <<std::endl;
@@ -176,25 +209,27 @@ int main(){
 
     std::vector<std::unique_ptr<Klocek>> obiekty;
     for(int i=0; i<10; i++){
-        obiekty.emplace_back(std::make_unique<Klocek_niebieski>());
-        obiekty[i]->setTexture(klocek_80);
+        obiekty.emplace_back(std::make_unique<Klocek_niebieski>(klocuchy));
         obiekty[i]->setPosition(405+i*64, 15);
-        obiekty[i]->setScale(1.0, 1.0);
     }
     for(int i=10; i<20; i++){
-        obiekty.emplace_back(std::make_unique<Klocek_fioletowy>());
-        obiekty[i]->setTexture(klocek_30);
-        obiekty[i]->setPosition(405+(i-10)*64, 47);
-        obiekty[i]->setScale(1.0, 1.0);
+        obiekty.emplace_back(std::make_unique<Klocek_fioletowy>(klocuchy));
+        obiekty[i]->setPosition(405+(i-10)*64, 79);
     }
     for(int i=20; i<30; i++){
-        obiekty.emplace_back(std::make_unique<Klocek_bialy>());
-        obiekty[i]->setTexture(klocek_10);
-        obiekty[i]->setPosition(405+(i-20)*64, 79);
-        obiekty[i]->setScale(1.0, 1.0);
+        obiekty.emplace_back(std::make_unique<Klocek_bialy>(klocuchy));
+        obiekty[i]->setPosition(405+(i-20)*64, 143);
+    }
+
+    for(int i =30; i<40; i++){
+        obiekty.emplace_back(std::make_unique<Klocek_niespodzianka>(klocuchy));
+        obiekty[i]->setPosition(405+(i-30)*64, 207);
     }
     int pnkty;
     int zy;
+
+    std::vector<std::unique_ptr<Modyfikator>> modyfikatory;
+
     while(window.isOpen()){
 
         sf::Event event;
@@ -240,8 +275,24 @@ int main(){
         pilka_.animate(platforma, obiekty, klocuchy);
         for (size_t i=0; i<obiekty.size(); ++i){
             if (obiekty[i]->usun){
+                Klocek_niespodzianka * nies = dynamic_cast<Klocek_niespodzianka*>(obiekty[i].get());
+                if (nies != nullptr){
+                   auto pos = obiekty[i]->getPosition();
+                    modyfikatory.emplace_back(std::make_unique<Modyfikator>(modyf, pos));
+
+
+                }
                 obiekty.erase(obiekty.begin()+i);
             }}
+
+        for(size_t i=0; i<modyfikatory.size(); i++){
+            modyfikatory[i]->animate();
+            modyfikatory[i]->make_bonus(platforma, pilka_);
+            if (modyfikatory[i]->usun){
+                modyfikatory.erase(modyfikatory.begin()+i);
+            }
+        }
+
         window.clear();
 
         window.draw(tlo_);
@@ -250,12 +301,15 @@ int main(){
         for(auto &x : obiekty){
             window.draw(*x);
         }
+        for(auto &y : modyfikatory){
+            window.draw(*y);
+        }
         window.draw(pilka_);
         window.draw(pu);
         window.draw(punkty);
         window.draw(zycie1);
         window.draw(zycie2);
-        if (pilka_.zycia<0){
+        if (pilka_.zycia<=0){
            window.draw(koniec);
             Sleep(1000);
             window.close();
