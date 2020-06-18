@@ -60,7 +60,7 @@ public:
 class Klocek_bialy : public Klocek{
 public:
 
-    Klocek_bialy(Textures &obj){dmg=0; max_dmg = 1; pkty =10; setTexture(obj.textures[6]);}
+    Klocek_bialy(Textures &obj){dmg=0; max_dmg = 1; pkty =10; setTexture(obj.textures[5]);}
     ~Klocek_bialy(){};
     virtual void changeTexture1(Textures &obj) override{};
     virtual void changeTexture2(Textures &obj) override{};
@@ -224,7 +224,7 @@ public:
 
 class Klocek_cegla : public Klocek{
 public:
-    Klocek_cegla(Textures &obj){dmg=0; max_dmg=INT_MAX; pkty=0; setTexture(obj.textures[6]);}
+    Klocek_cegla(Textures &obj){dmg=0; max_dmg=1000000000; pkty=0; setTexture(obj.textures[6]);}
     ~Klocek_cegla(){};
     virtual void changeTexture1(Textures &obj) override{};
     virtual void changeTexture2(Textures &obj) override{};

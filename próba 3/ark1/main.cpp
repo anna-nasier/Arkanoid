@@ -1,7 +1,6 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include "klasy.h"
-#include<windows.h>
 
 
 int width = 1280;
@@ -123,6 +122,8 @@ int main(){
         std::cerr << "Could not load texture" << std::endl;
         return 1;
     }
+
+
     Platforma platforma;
     platforma.setTexture(platforma_normalna);
     platforma.setPosition(430, 700);
@@ -162,13 +163,17 @@ int main(){
     }
     modifiers.emplace_back(death);
 
+
     sf::Texture points;
     if (!points.loadFromFile("gold.png")) {
         std::cerr << "Could not load texture" << std::endl;
         return 1;
     }
     modifiers.emplace_back(points);
+
     Textures modyf(modifiers);
+
+
     //napisy
 
     sf::Font font;
@@ -198,11 +203,17 @@ int main(){
 
     sf::Text koniec;
     koniec.setFont(font);
-    koniec.setPosition(400, 360);
+    koniec.setPosition(400, 260);
     koniec.setCharacterSize(100);
     std::string konie="PRZEGRANA!";
     koniec.setString(konie);
 
+    sf::Text koniec2;
+    koniec2.setFont(font);
+    koniec2.setPosition(400, 360);
+    koniec2.setCharacterSize(50);
+    std::string konie2="Escape, aby wyjsc!";
+    koniec2.setString(konie2);
 
     size_t napisType = 0;
     sf::Clock clock;
@@ -225,13 +236,18 @@ int main(){
         obiekty.emplace_back(std::make_unique<Klocek_niespodzianka>(klocuchy));
         obiekty[i]->setPosition(405+(i-30)*64, 207);
     }
+
+    for(int i=40; i<43; i++){
+        obiekty.emplace_back(std::make_unique<Klocek_cegla>(klocuchy));
+        obiekty[i]->setPosition(405+(i-40)*64, 239);
+    }
     int pnkty;
     int zy;
 
     std::vector<std::unique_ptr<Modyfikator>> modyfikatory;
 
     while(window.isOpen()){
-
+      if(pilka_.zycia>0)  {
         sf::Event event;
         while(window.pollEvent(event)){
             if(event.type==sf::Event::Closed) {window.close();}
@@ -309,10 +325,12 @@ int main(){
         window.draw(punkty);
         window.draw(zycie1);
         window.draw(zycie2);
-        if (pilka_.zycia<=0){
+    }
+        else{
+           window.clear();
            window.draw(koniec);
-            Sleep(1000);
-            window.close();
+           window.draw(koniec2);
+           if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {window.close();}
         }
 
         window.display();
