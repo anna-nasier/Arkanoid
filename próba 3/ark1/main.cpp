@@ -1,12 +1,57 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include "klasy.h"
+<<<<<<< Updated upstream
+=======
+#include<fstream>
+#include <algorithm>
+>>>>>>> Stashed changes
 
 
 int width = 1280;
 int height = 720;
 
 
+void lvl_loading(std::vector<std::fstream*> &poziomy, std::vector<std::unique_ptr<Klocek>> &klocki, int nr_poziomu, Textures &obj){
+    std::string rzadek;
+    int j=0;
+    int it=0;
+    while(getline(*poziomy[nr_poziomu],rzadek)){
+        std::vector<int> rzad = split(rzadek, ';');
+        for(unsigned int i=0; i<rzad.size(); i++){
+            switch(rzad[i]){
+            case(0):{
+                klocki.emplace_back(std::make_unique<Klocek_niebieski>(obj));
+                klocki[it]->setPosition(405+i*43,15+ 21.5*j);
+            break;}
+            case(1):{
+                klocki.emplace_back(std::make_unique<Klocek_fioletowy>(obj));
+                klocki[it]->setPosition(405+i*43,15+ 21.5*j);
+            break;}
+            case(2):{
+                klocki.emplace_back(std::make_unique<Klocek_bialy>(obj));
+                klocki[it]->setPosition(405+i*43,15+ 21.5*j);
+            break;
+            }
+            case(3):{
+                klocki.emplace_back(std::make_unique<Klocek_niespodzianka>(obj));
+                klocki[it]->setPosition(405+i*43,15+ 21.5*j);
+            break;
+            }
+            case(4):{
+                klocki.emplace_back(std::make_unique<Klocek_cegla>(obj));
+                klocki[it]->setPosition(405+i*43,15+ 21.5*j);
+            break;
+            }}
+            it++;}
+        j++;}
+}
+bool blocks_left(std::unique_ptr<Klocek> &klocek){
+    Klocek_cegla * c = dynamic_cast<Klocek_cegla*>(klocek.get());
+    if (c != nullptr)return true;
+        else return false;
+
+}
 
 int main(){
 
@@ -137,10 +182,150 @@ int main(){
     pilka_.setPosition(640, 500);
 
 
+<<<<<<< Updated upstream
     size_t napisType = 0;
     sf::Clock clock;
 
     std::vector<Klocek*> wsk_obiekty;
+=======
+
+    //modyfikatory
+
+    std::vector<sf::Texture> modifiers;
+
+    sf::Texture slow;
+    if (!slow.loadFromFile("snail.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+        return 1;
+    }
+    modifiers.emplace_back(slow);
+
+    sf::Texture fast;
+    if (!fast.loadFromFile("rabbit.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+        return 1;
+    }
+    modifiers.emplace_back(fast);
+    sf::Texture death;
+    if (!death.loadFromFile("skull.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+        return 1;
+    }
+    modifiers.emplace_back(death);
+
+
+    sf::Texture points;
+    if (!points.loadFromFile("gold.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+        return 1;
+    }
+    modifiers.emplace_back(points);
+
+    Textures modyf(modifiers);
+
+
+    //napisy
+
+    sf::Font font;
+    if (!font.loadFromFile("Acme-Regular.ttf")){
+        std::cout<<"Could not load font" <<std::endl;
+    }
+
+    sf::Text pu;
+    pu.setFont(font);
+    pu.setPosition(40,120);
+    std::string pi="PUNKTY:";
+    pu.setString(pi);
+
+    sf::Text punkty;
+    punkty.setFont(font);
+    punkty.setPosition(170,120);
+
+    sf::Text zycie1;
+    zycie1.setFont(font);
+    zycie1.setPosition(40, 150);
+    std::string z="ZYCIA:";
+    zycie1.setString(z);
+
+    sf::Text zycie2;
+    zycie2.setFont(font);
+    zycie2.setPosition(140, 150);
+
+    sf::Text koniec;
+    koniec.setFont(font);
+    koniec.setPosition(400, 260);
+    koniec.setCharacterSize(100);
+    std::string konie="PRZEGRANA!";
+    koniec.setString(konie);
+
+    sf::Text koniec2;
+    koniec2.setFont(font);
+    koniec2.setPosition(400, 360);
+    koniec2.setCharacterSize(50);
+    std::string konie2="Escape, aby wyjsc!";
+    koniec2.setString(konie2);
+
+    //poziom!
+
+    std::vector<std::fstream *> poziomy;
+
+    std::fstream poziom1;
+    poziom1.open("poz.txt", std::ios::in);
+    if(!poziom1.good()){
+        std::cout<<"Nie udało się wczytać gry!"<<std::endl;
+        window.close();
+    }
+
+    std::fstream * poz1 = &poziom1;
+    poziomy.emplace_back(poz1);
+
+    std::fstream poziom2;
+    poziom2.open("poz2.txt", std::ios::in);
+    if(!poziom2.good()){
+        std::cout<<"Nie udało się wczytać gry!"<<std::endl;
+        window.close();
+    }
+    std::fstream * poz2 = &poziom2;
+    poziomy.emplace_back(poz2);
+
+    int nr_poziomu =0;
+
+    std::vector<std::unique_ptr<Klocek>> obiekty;
+    size_t napisType = 0;
+    sf::Clock clock;
+
+
+/*    for(int i=0; i<20; i++){
+        obiekty.emplace_back(std::make_unique<Klocek_niebieski>(klocuchy));
+        obiekty[i]->setPosition(405+i*43, 15);
+    }
+    for(int i=20; i<40; i++){
+        obiekty.emplace_back(std::make_unique<Klocek_fioletowy>(klocuchy));
+        obiekty[i]->setPosition(405+(i-20)*43, 36.5);
+    }
+    for(int i=40; i<60; i++){
+        obiekty.emplace_back(std::make_unique<Klocek_bialy>(klocuchy));
+        obiekty[i]->setPosition(405+(i-40)*43, 58);
+    }
+
+    for(int i =60; i<80; i++){
+        obiekty.emplace_back(std::make_unique<Klocek_niespodzianka>(klocuchy));
+        obiekty[i]->setPosition(405+(i-60)*43, 79.5);
+    }
+
+    for(int i=80; i<85; i++){
+        obiekty.emplace_back(std::make_unique<Klocek_cegla>(klocuchy));
+        obiekty[i]->setPosition(405+(i-80)*43, 101);
+    }
+    */
+
+
+
+    int pnkty;
+    int zy;
+    lvl_loading(poziomy, obiekty, nr_poziomu, klocuchy);
+    std::vector<std::unique_ptr<Modyfikator>> modyfikatory;
+>>>>>>> Stashed changes
 
     while(window.isOpen()){
 
@@ -170,11 +355,37 @@ int main(){
         }
         // koniec
 
+<<<<<<< Updated upstream
         for(int i=0; i<10; i++){
             Klocek_niebieski kloc;
             kloc.setTexture(klocek_80);
             kloc.setPosition(405+i*64, 15);
             wsk_obiekty.emplace_back(&kloc);
+=======
+        if(obiekty.size()==0 || std::any_of(obiekty.begin(), obiekty.end(), blocks_left)){
+            nr_poziomu++;
+            lvl_loading(poziomy, obiekty, nr_poziomu, klocuchy);
+
+        }
+
+
+
+
+
+
+        //punkty
+        pnkty = pilka_.points;
+        std::string p = std::to_string(pnkty);
+        punkty.setString(p);
+
+        //zycia
+
+        zy= pilka_.zycia;
+        std::string zycka = std::to_string(zy);
+        zycie2.setString(zycka);
+
+
+>>>>>>> Stashed changes
 
         }
 
