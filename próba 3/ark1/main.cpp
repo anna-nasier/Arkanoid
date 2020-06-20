@@ -1,10 +1,34 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include "klasy.h"
+#include<fstream>
 
 
 int width = 1280;
 int height = 720;
+
+std::vector<int> split(std::string rzadek, char separator=' '){
+    size_t position1=0;
+    size_t position2=0;
+    std::vector<int> kloc;
+    std::string nr;
+    int kl_poj;
+    while ((position1 = rzadek.find(separator, position1 + 1)) != std::string::npos){
+        //std:: cout <<"2: " <<position2<<std::endl;
+        //std::cout <<"1: "<< position1 << std::endl;
+        //std:: cout << "3: "<< position1-position2 <<std::endl;
+        nr = rzadek.substr(position2,position1-position2);
+        std::cout<<nr<<std::endl;
+        kl_poj = atoi(nr.c_str());
+        std::cout<<kl_poj<<std::endl;
+        kloc.emplace_back(kl_poj);
+        position2=position1+1;
+    };
+    nr = rzadek.substr(position2,rzadek.length()-position2);
+    kl_poj = atoi(nr.c_str());
+    kloc.emplace_back(kl_poj);
+    return kloc;
+};
 
 
 
@@ -12,8 +36,8 @@ int main(){
 
     sf::RenderWindow window(sf::VideoMode(width,height),"Arkanoid");
     window.setFramerateLimit(120);
-
     std::vector<sf::Texture>toLoad;
+
 
     //tlo napis i sprite
 
@@ -26,6 +50,7 @@ int main(){
     tlo_.setScale(1.0, 1.0);
     tlo_.setTextureRect(sf::IntRect(0, 0, width , height));
     tlo_.setTexture(tlo);
+
 
     //napis tekstury i sprite
 
@@ -50,7 +75,11 @@ int main(){
     sf::Sprite napis;
     napis.setPosition(55,0);
 
+
+
     // klocki - tekstury
+
+
     std::vector<sf::Texture> klocki;
     // 80 pktow - niebieski - w wektorze [0]-[2]
 
@@ -115,6 +144,7 @@ int main(){
     klocki.emplace_back(klocek_niespodzianka);
     Textures klocuchy(klocki);
 
+
     // platfotma
 
     sf::Texture platforma_normalna;
@@ -129,6 +159,8 @@ int main(){
     platforma.setPosition(430, 700);
 
 
+    //pilka
+
     sf::Texture pilka;
     if (!pilka.loadFromFile("pilka.png")) {
         std::cerr << "Could not load texture" << std::endl;
@@ -138,6 +170,8 @@ int main(){
     pilka_.setTexture(pilka);
     pilka_.setScale(0.2,0.2);
     pilka_.setPosition(640, 500);
+
+
 
     //modyfikatory
 
@@ -215,32 +249,83 @@ int main(){
     std::string konie2="Escape, aby wyjsc!";
     koniec2.setString(konie2);
 
+    //poziom!
+
+
+    std::fstream poziom;
+    poziom.open("poz.txt", std::ios::in);
+    if(!poziom.good()){
+        std::cout<<"Nie udało się wczytać gry!"<<std::endl;
+        window.close();
+    }
+    std::vector<std::unique_ptr<Klocek>> obiekty;
+    std::string rzadek;
+    int j=0;
+    int it=0;
+    while(getline(poziom,rzadek)){
+        std::vector<int> rzad = split(rzadek, ';');
+        for(unsigned int i=0; i<rzad.size(); i++){
+            switch(rzad[i]){
+            case(0):{
+                obiekty.emplace_back(std::make_unique<Klocek_niebieski>(klocuchy));
+                obiekty[it]->setPosition(405+i*43,15+ 21.5*j);
+            break;}
+            case(1):{
+                obiekty.emplace_back(std::make_unique<Klocek_fioletowy>(klocuchy));
+                obiekty[it]->setPosition(405+i*43,15+ 21.5*j);
+            break;}
+            case(2):{
+                obiekty.emplace_back(std::make_unique<Klocek_bialy>(klocuchy));
+                obiekty[it]->setPosition(405+i*43,15+ 21.5*j);
+            break;
+            }
+            case(3):{
+                obiekty.emplace_back(std::make_unique<Klocek_niespodzianka>(klocuchy));
+                obiekty[it]->setPosition(405+i*43,15+ 21.5*j);
+            break;
+            }
+            case(4):{
+                obiekty.emplace_back(std::make_unique<Klocek_cegla>(klocuchy));
+                obiekty[it]->setPosition(405+i*43,15+ 21.5*j);
+            break;
+            }}
+            it++;}
+        j++;}
+
+
+
+
+
     size_t napisType = 0;
     sf::Clock clock;
 
-    std::vector<std::unique_ptr<Klocek>> obiekty;
-    for(int i=0; i<10; i++){
+
+/*    for(int i=0; i<20; i++){
         obiekty.emplace_back(std::make_unique<Klocek_niebieski>(klocuchy));
-        obiekty[i]->setPosition(405+i*64, 15);
+        obiekty[i]->setPosition(405+i*43, 15);
     }
-    for(int i=10; i<20; i++){
+    for(int i=20; i<40; i++){
         obiekty.emplace_back(std::make_unique<Klocek_fioletowy>(klocuchy));
-        obiekty[i]->setPosition(405+(i-10)*64, 79);
+        obiekty[i]->setPosition(405+(i-20)*43, 36.5);
     }
-    for(int i=20; i<30; i++){
+    for(int i=40; i<60; i++){
         obiekty.emplace_back(std::make_unique<Klocek_bialy>(klocuchy));
-        obiekty[i]->setPosition(405+(i-20)*64, 143);
+        obiekty[i]->setPosition(405+(i-40)*43, 58);
     }
 
-    for(int i =30; i<40; i++){
+    for(int i =60; i<80; i++){
         obiekty.emplace_back(std::make_unique<Klocek_niespodzianka>(klocuchy));
-        obiekty[i]->setPosition(405+(i-30)*64, 207);
+        obiekty[i]->setPosition(405+(i-60)*43, 79.5);
     }
 
-    for(int i=40; i<43; i++){
+    for(int i=80; i<85; i++){
         obiekty.emplace_back(std::make_unique<Klocek_cegla>(klocuchy));
-        obiekty[i]->setPosition(405+(i-40)*64, 239);
+        obiekty[i]->setPosition(405+(i-80)*43, 101);
     }
+    */
+
+
+
     int pnkty;
     int zy;
 
@@ -251,7 +336,7 @@ int main(){
         sf::Event event;
         while(window.pollEvent(event)){
             if(event.type==sf::Event::Closed) {window.close();}
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {window.close();}
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {window.close();}
             if(event.type==sf::Event::MouseMoved) {
                platforma.animate(window);
                platforma.bounce();

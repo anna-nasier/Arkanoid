@@ -60,7 +60,7 @@ public:
 class Klocek_bialy : public Klocek{
 public:
 
-    Klocek_bialy(Textures &obj){dmg=0; max_dmg = 1; pkty =10; setTexture(obj.textures[5]);}
+    Klocek_bialy(Textures &obj){dmg=0; max_dmg = 1; pkty =10; setTexture(obj.textures[5]); setScale(0.67, 0.67);}
     ~Klocek_bialy(){};
     virtual void changeTexture1(Textures &obj) override{};
     virtual void changeTexture2(Textures &obj) override{};
@@ -69,7 +69,7 @@ public:
 class Klocek_fioletowy :public Klocek{
 public:
 
-    Klocek_fioletowy(Textures &obj){dmg=0; max_dmg = 2; pkty = 30; setTexture(obj.textures[3]);}
+    Klocek_fioletowy(Textures &obj){dmg=0; max_dmg = 2; pkty = 30; setTexture(obj.textures[3]); setScale(0.67, 0.67);}
     ~Klocek_fioletowy(){};
     void changeTexture1(Textures &obj) override{
         auto Ptr = &obj.textures[4];
@@ -81,7 +81,7 @@ public:
 class Klocek_niebieski :public Klocek{
 public:
 
-    Klocek_niebieski(Textures &obj){dmg=0; max_dmg = 4; pkty = 80; setTexture(obj.textures[0]); }
+    Klocek_niebieski(Textures &obj){dmg=0; max_dmg = 4; pkty = 80; setTexture(obj.textures[0]); setScale(0.67, 0.67); }
     ~Klocek_niebieski(){};
     void changeTexture1(Textures &obj) override {
         auto Ptr = &obj.textures[1];
@@ -124,25 +124,28 @@ public:
                     if(x->getGlobalBounds().top < getPosition().y && x->getGlobalBounds().left<getPosition().x &&
                        x->getGlobalBounds().left + x->getGlobalBounds().width > getPosition().x){
                        vely = -vely;
-                        std::cout<<"a"<<std::endl;}
+                        //std::cout<<"a"<<std::endl;
+                    }
                     //zderzenie od dołu
                    else if (x->getGlobalBounds().top + x->getGlobalBounds().height>getPosition().y &&
                         x->getGlobalBounds().left < getPosition().x &&
                         x->getGlobalBounds().left + x->getGlobalBounds().width > getPosition().x)
                        {vely=-vely;
-                        std::cout<<"b"<<std::endl;}
+                        //std::cout<<"b"<<std::endl;
+                       }
                     //zderzenie od lewej
                    else if (x->getGlobalBounds().left < getPosition().x && x->getGlobalBounds().top < getPosition().y &&
                         x->getGlobalBounds().top+x->getGlobalBounds().height > getPosition().y){
                         velx=-velx;
-                        std::cout<<"c"<<std::endl;
+                        //std::cout<<"c"<<std::endl;
                     }
                     //zderzenie od prawej
                    else if (x->getGlobalBounds().left + x->getGlobalBounds().width > getPosition().x &&
                         x->getGlobalBounds().top <getPosition().y &&
                         x->getGlobalBounds().top + x->getGlobalBounds().height > getPosition().y)
                     {velx=-velx;
-                        std::cout<<"d"<<std::endl;}
+                        //std::cout<<"d"<<std::endl;
+                           }
                        x->dmg++;
                        std::cout<<x->dmg<<std::endl;
                        std::cout<<x->usun<<std::endl;
@@ -214,7 +217,7 @@ public:
 
 class Klocek_niespodzianka:public Klocek {
 public:
-    Klocek_niespodzianka(Textures &obj){dmg=0; max_dmg=1; pkty =0; setTexture(obj.textures[7]);}
+    Klocek_niespodzianka(Textures &obj){dmg=0; max_dmg=1; pkty =0; setTexture(obj.textures[7]); setScale(0.67, 0.67);}
     virtual void changeTexture1(Textures &obj) override{};
     virtual void changeTexture2(Textures &obj) override{};
 
@@ -224,7 +227,7 @@ public:
 
 class Klocek_cegla : public Klocek{
 public:
-    Klocek_cegla(Textures &obj){dmg=0; max_dmg=1000000000; pkty=0; setTexture(obj.textures[6]);}
+    Klocek_cegla(Textures &obj){dmg=0; max_dmg=1000000000; pkty=0; setTexture(obj.textures[6]); setScale(0.67, 0.67);}
     ~Klocek_cegla(){};
     virtual void changeTexture1(Textures &obj) override{};
     virtual void changeTexture2(Textures &obj) override{};
