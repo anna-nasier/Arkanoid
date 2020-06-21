@@ -120,24 +120,24 @@ public:
         }
         for(auto &x: w){
                 if (x->getGlobalBounds().intersects(bounds)){
-                    //zderzenie od góry
+
                     if(x->getGlobalBounds().top < getPosition().y && x->getGlobalBounds().left<getPosition().x &&
                        x->getGlobalBounds().left + x->getGlobalBounds().width > getPosition().x){
                        vely = -vely;
                         //std::cout<<"a"<<std::endl;
                     }
-                    //zderzenie od dołu
+
                    else if (x->getGlobalBounds().top + x->getGlobalBounds().height>getPosition().y &&
                         x->getGlobalBounds().left < getPosition().x &&
                         x->getGlobalBounds().left + x->getGlobalBounds().width > getPosition().x)
                        {vely=-vely;
-                        //std::cout<<"b"<<std::endl;
+
                        }
                     //zderzenie od lewej
                    else if (x->getGlobalBounds().left < getPosition().x && x->getGlobalBounds().top < getPosition().y &&
                         x->getGlobalBounds().top+x->getGlobalBounds().height > getPosition().y){
                         velx=-velx;
-                        //std::cout<<"c"<<std::endl;
+
                     }
                     //zderzenie od prawej
                    else if (x->getGlobalBounds().left + x->getGlobalBounds().width > getPosition().x &&
@@ -147,8 +147,6 @@ public:
                         //std::cout<<"d"<<std::endl;
                            }
                        x->dmg++;
-                       std::cout<<x->dmg<<std::endl;
-                       std::cout<<x->usun<<std::endl;
                        if (x->dmg==x->max_dmg) {x->usun = true; points = points + x->pkty;}
                        x->changeTexture1(obj);
                        x->changeTexture2(obj);

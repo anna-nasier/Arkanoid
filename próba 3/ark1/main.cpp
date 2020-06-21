@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include "klasy.h"
 #include<fstream>
+#include <algorithm>
 
 
 int width = 1280;
@@ -24,13 +25,53 @@ std::vector<int> split(std::string rzadek, char separator=' '){
         kloc.emplace_back(kl_poj);
         position2=position1+1;
     };
-    nr = rzadek.substr(position2,rzadek.length()-position2);
-    kl_poj = atoi(nr.c_str());
-    kloc.emplace_back(kl_poj);
-    return kloc;
+     nr = rzadek.substr(position2,rzadek.length()-position2);
+     kl_poj = atoi(nr.c_str());
+     kloc.emplace_back(kl_poj);
+     return kloc;
 };
 
 
+void lvl_loading(std::vector<std::fstream*> &poziomy, std::vector<std::unique_ptr<Klocek>> &klocki, int nr_poziomu, Textures &obj){
+    std::string rzadek;
+    int j=0;
+    int it=0;
+    while(getline(*poziomy[nr_poziomu],rzadek)){
+        std::vector<int> rzad = split(rzadek, ';');
+        for(unsigned int i=0; i<rzad.size(); i++){
+            switch(rzad[i]){
+            case(0):{
+                klocki.emplace_back(std::make_unique<Klocek_niebieski>(obj));
+                klocki[it]->setPosition(405+i*43,15+ 21.5*j);
+            break;}
+            case(1):{
+                klocki.emplace_back(std::make_unique<Klocek_fioletowy>(obj));
+                klocki[it]->setPosition(405+i*43,15+ 21.5*j);
+            break;}
+            case(2):{
+                klocki.emplace_back(std::make_unique<Klocek_bialy>(obj));
+                klocki[it]->setPosition(405+i*43,15+ 21.5*j);
+            break;
+            }
+            case(3):{
+                klocki.emplace_back(std::make_unique<Klocek_niespodzianka>(obj));
+                klocki[it]->setPosition(405+i*43,15+ 21.5*j);
+            break;
+            }
+            case(4):{
+                klocki.emplace_back(std::make_unique<Klocek_cegla>(obj));
+                klocki[it]->setPosition(405+i*43,15+ 21.5*j);
+            break;
+            }}
+            it++;}
+        j++;}
+}
+bool blocks_left(std::unique_ptr<Klocek> &klocek){
+    Klocek_cegla * c = dynamic_cast<Klocek_cegla*>(klocek.get());
+    if (c != nullptr)return true;
+        else return false;
+
+}
 
 int main(){
 
@@ -249,53 +290,48 @@ int main(){
     std::string konie2="Escape, aby wyjsc!";
     koniec2.setString(konie2);
 
+
+    sf::Text koniec3;
+    koniec3.setFont(font);
+    koniec3.setPosition(400, 260);
+    koniec3.setCharacterSize(100);
+    std::string konie3="WYGRANA!";
+    koniec3.setString(konie3);
+
+
+    sf::Text koniec4;
+    koniec4.setFont(font);
+    koniec4.setPosition(400, 360);
+    koniec4.setCharacterSize(50);
+    std::string konie4="Escape, aby wyjsc!";
+    koniec4.setString(konie4);
     //poziom!
 
+    std::vector<std::fstream *> poziomy;
 
-    std::fstream poziom;
-    poziom.open("poz.txt", std::ios::in);
-    if(!poziom.good()){
+    std::fstream poziom1;
+    poziom1.open("poz.txt", std::ios::in);
+    if(!poziom1.good()){
         std::cout<<"Nie udało się wczytać gry!"<<std::endl;
         window.close();
     }
+
+    std::fstream * poz1 = &poziom1;
+    poziomy.emplace_back(poz1);
+
+    std::fstream poziom2;
+    poziom2.open("poz2.txt", std::ios::in);
+    if(!poziom2.good()){
+        std::cout<<"Nie udało się wczytać gry!"<<std::endl;
+        window.close();
+    }
+    std::fstream * poz2 = &poziom2;
+    poziomy.emplace_back(poz2);
+
+    int nr_poziomu =0;
+    int max_nr_poz = 2;
+
     std::vector<std::unique_ptr<Klocek>> obiekty;
-    std::string rzadek;
-    int j=0;
-    int it=0;
-    while(getline(poziom,rzadek)){
-        std::vector<int> rzad = split(rzadek, ';');
-        for(unsigned int i=0; i<rzad.size(); i++){
-            switch(rzad[i]){
-            case(0):{
-                obiekty.emplace_back(std::make_unique<Klocek_niebieski>(klocuchy));
-                obiekty[it]->setPosition(405+i*43,15+ 21.5*j);
-            break;}
-            case(1):{
-                obiekty.emplace_back(std::make_unique<Klocek_fioletowy>(klocuchy));
-                obiekty[it]->setPosition(405+i*43,15+ 21.5*j);
-            break;}
-            case(2):{
-                obiekty.emplace_back(std::make_unique<Klocek_bialy>(klocuchy));
-                obiekty[it]->setPosition(405+i*43,15+ 21.5*j);
-            break;
-            }
-            case(3):{
-                obiekty.emplace_back(std::make_unique<Klocek_niespodzianka>(klocuchy));
-                obiekty[it]->setPosition(405+i*43,15+ 21.5*j);
-            break;
-            }
-            case(4):{
-                obiekty.emplace_back(std::make_unique<Klocek_cegla>(klocuchy));
-                obiekty[it]->setPosition(405+i*43,15+ 21.5*j);
-            break;
-            }}
-            it++;}
-        j++;}
-
-
-
-
-
     size_t napisType = 0;
     sf::Clock clock;
 
@@ -328,7 +364,7 @@ int main(){
 
     int pnkty;
     int zy;
-
+    lvl_loading(poziomy, obiekty, nr_poziomu, klocuchy);
     std::vector<std::unique_ptr<Modyfikator>> modyfikatory;
 
     while(window.isOpen()){
@@ -358,6 +394,8 @@ int main(){
         clock.restart();
         }
         // koniec
+
+
 
         //punkty
         pnkty = pilka_.points;
@@ -410,9 +448,38 @@ int main(){
         window.draw(punkty);
         window.draw(zycie1);
         window.draw(zycie2);
+        if(obiekty.size()==0 || std::all_of(obiekty.begin(), obiekty.end(), blocks_left)){
+            obiekty.clear();
+            if (nr_poziomu<max_nr_poz-1){
+                nr_poziomu++;
+                lvl_loading(poziomy, obiekty, nr_poziomu, klocuchy);
+                pilka_.vely = - pilka_.vely;
+                pilka_.setPosition(500, 500);
+            }
+            else{
+                window.clear();
+                pu.setPosition(400, 460);
+                punkty.setPosition(570, 460);
+                zycie1.setPosition(650,490);
+                zycie2.setPosition(750,460);
+                zycie1.setPosition(650,460);
+                zycie2.setPosition(750,460);
+                window.draw(zycie1);
+                window.draw(zycie2);
+                window.draw(pu);
+                window.draw(punkty);
+                window.draw(koniec3);
+                window.draw(koniec4);
+            }
+
+        }
     }
         else{
            window.clear();
+           pu.setPosition(400, 460);
+           punkty.setPosition(530, 460);
+           window.draw(pu);
+           window.draw(punkty);
            window.draw(koniec);
            window.draw(koniec2);
            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {window.close();}
