@@ -65,6 +65,7 @@ void lvl_loading(std::vector<std::fstream*> &poziomy, std::vector<std::unique_pt
             }}
             it++;}
         j++;}
+    poziomy[nr_poziomu]->close();
 }
 bool blocks_left(std::unique_ptr<Klocek> &klocek){
     Klocek_cegla * c = dynamic_cast<Klocek_cegla*>(klocek.get());
@@ -328,40 +329,25 @@ int main(){
     std::fstream * poz2 = &poziom2;
     poziomy.emplace_back(poz2);
 
-    int nr_poziomu =0;
-    int max_nr_poz = 2;
+
+    std::fstream poziom3;
+    poziom3.open("poz3.txt", std::ios::in);
+    if(!poziom3.good()){
+        std::cout<<"Nie udało się wczytać gry!"<<std::endl;
+        window.close();
+    }
+
+    std::fstream * poz3 = &poziom3;
+    poziomy.emplace_back(poz3);
 
     std::vector<std::unique_ptr<Klocek>> obiekty;
     size_t napisType = 0;
     sf::Clock clock;
 
 
-/*    for(int i=0; i<20; i++){
-        obiekty.emplace_back(std::make_unique<Klocek_niebieski>(klocuchy));
-        obiekty[i]->setPosition(405+i*43, 15);
-    }
-    for(int i=20; i<40; i++){
-        obiekty.emplace_back(std::make_unique<Klocek_fioletowy>(klocuchy));
-        obiekty[i]->setPosition(405+(i-20)*43, 36.5);
-    }
-    for(int i=40; i<60; i++){
-        obiekty.emplace_back(std::make_unique<Klocek_bialy>(klocuchy));
-        obiekty[i]->setPosition(405+(i-40)*43, 58);
-    }
 
-    for(int i =60; i<80; i++){
-        obiekty.emplace_back(std::make_unique<Klocek_niespodzianka>(klocuchy));
-        obiekty[i]->setPosition(405+(i-60)*43, 79.5);
-    }
-
-    for(int i=80; i<85; i++){
-        obiekty.emplace_back(std::make_unique<Klocek_cegla>(klocuchy));
-        obiekty[i]->setPosition(405+(i-80)*43, 101);
-    }
-    */
-
-
-
+    int nr_poziomu = 0;
+    int max_nr_poz = 3;
     int pnkty;
     int zy;
     lvl_loading(poziomy, obiekty, nr_poziomu, klocuchy);
@@ -450,7 +436,7 @@ int main(){
         window.draw(zycie2);
         if(obiekty.size()==0 || std::all_of(obiekty.begin(), obiekty.end(), blocks_left)){
             obiekty.clear();
-            if (nr_poziomu<max_nr_poz-1){
+            if (nr_poziomu<max_nr_poz){
                 nr_poziomu++;
                 lvl_loading(poziomy, obiekty, nr_poziomu, klocuchy);
                 pilka_.vely = - pilka_.vely;
